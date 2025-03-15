@@ -257,9 +257,6 @@
             if (registerData.status === "Error") {
               errorMessage.textContent = registerData.log;
             } else {
-              alert(
-                "Um e-mail de verificação foi enviado para o seu endereço de e-mail. Por favor, verifique sua caixa de entrada."
-              );
               window.location.href = "/login.html"; // Redireciona para a página de login após o registro
             }
           } catch (error) {
