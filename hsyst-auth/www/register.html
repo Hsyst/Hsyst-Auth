@@ -46,6 +46,7 @@
         font-family: "Poppins", sans-serif;
       }
     </style>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   </head>
 
   <body class="bg-gradient-to-br from-dark-light to-dark min-h-screen">
@@ -111,6 +112,7 @@
             >
               Senha
             </label>
+            <div class="flex flex-row gap-4">
             <div class="relative">
               <input
                 type="password"
@@ -125,6 +127,15 @@
               >
                 🔒
               </span>
+              </div>
+              <button type="button" onclick="var input = document.getElementById('password'); var icon = document.getElementById('eyeIcon'); if (input.type === 'password') { input.type = 'text'; icon.innerHTML = '<i class=\'bx bxs-show\'></i>'; } else { input.type = 'password'; icon.innerHTML = '<i class=\'bx bxs-low-vision\'></i>'; }" class="w-1/4 py-4 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-primary/50 relative overflow-hidden group">
+                <span id="eyeIcon">
+                  <i class='bx bxs-low-vision max-w-full'></i> 
+                </span>
+                <div
+              class="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"
+              ></div>
+              </button>
             </div>
           </div>
 
