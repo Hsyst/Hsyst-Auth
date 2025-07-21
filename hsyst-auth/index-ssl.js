@@ -6,6 +6,7 @@ const express = require('express');
 const fs = require('fs')
 const sqlite3 = require('sqlite3').verbose();
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const app = express();
 const port = 443;
@@ -29,6 +30,7 @@ if (Buffer.from(ciferaes, 'hex').length !== 32) {
 }
 
 app.use(express.json());
+app.use(cookieParser());
 
 const db = new sqlite3.Database('./tokens.db');
 function generateTokenAES(email, senha) {
@@ -59,6 +61,46 @@ function generateTokenJWT(email, senha) {
 
 db.serialize(() => {
   db.run("CREATE TABLE tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT)");
+});
+
+// Função de verificação do cookie
+function verificarCookie(tokenReg) {
+
+  try {
+    const decodedToken = decryptTokenAES(tokenReg);
+
+    db.all("SELECT * FROM tokens", (err, rows) => {
+      if (err) {
+        return res.status(500).json({ message: 'Erro ao acessar o banco de dados', status: 'Error', log: "Erro no acesso a Database. Tente novamente mais tarde." });
+      }
+
+      const tokenMatch = rows.some(row => {
+        const decodedDatabaseToken = decryptTokenAES(row.token);
+        return decodedDatabaseToken === decodedToken;
+      });
+
+      if (tokenMatch) {
+        return "true";
+      } else {
+        return "false";
+      }
+    });
+  } catch (err) {
+    return "false"
+  }
+};
+
+// Middleware para proteger rotas
+app.use((req, res, next) => {
+  // Verifica se a requisição é para a pasta protegida
+  if (req.path.includes('/html/')) {
+    // Verifica o cookie
+    const resultado = verificarCookie(req.cookies.tokenAES);
+    if (resultado === "false") {
+      return res.redirect('/logout.html');
+    }
+  }
+  next();
 });
 
 app.use(express.static('www'));
