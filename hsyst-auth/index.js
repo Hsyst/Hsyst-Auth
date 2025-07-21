@@ -8,8 +8,8 @@ const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const app = express();
 const port = 3000;
-const JWT_SECRET = "4336dc6f834a3a583eac56bb5390e8aa57e40510afca9497a46fb2850c8da68f";
-const ciferaes = "4336dc6f834a3a583eac56bb5390e8aa57e40510afca9497a46fb2850c8da68f";
+const JWT_SECRET = "COLOQUE_SUA_JWT_SECRET_AQUI";
+const ciferaes = "COLOQUE_A_CIFRA_GERADA_AQUI";
 
 if (Buffer.from(ciferaes, 'hex').length !== 32) {
   console.log('A chave deve ter exatamente 32 bytes (64 caracteres hexadecimais).');
