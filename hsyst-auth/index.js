@@ -4,11 +4,12 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const app = express();
 const port = 3000;
-const JWT_SECRET = "JWT_SECRET_THERE";
-const ciferaes = "AES-CBC-256_SECRET_THERE";
+const JWT_SECRET = "4336dc6f834a3a583eac56bb5390e8aa57e40510afca9497a46fb2850c8da68f";
+const ciferaes = "4336dc6f834a3a583eac56bb5390e8aa57e40510afca9497a46fb2850c8da68f";
 
 if (Buffer.from(ciferaes, 'hex').length !== 32) {
   console.log('A chave deve ter exatamente 32 bytes (64 caracteres hexadecimais).');
@@ -45,7 +46,49 @@ function generateTokenJWT(email, senha) {
 }
 
 db.serialize(() => {
-  db.run("CREATE TABLE tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT)");
+//  db.run("CREATE TABLE tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT)");
+});
+
+app.use(cookieParser());
+
+// Função de verificação do cookie
+function verificarCookie(tokenReg) {
+
+  try {
+    const decodedToken = decryptTokenAES(tokenReg);
+
+    db.all("SELECT * FROM tokens", (err, rows) => {
+      if (err) {
+        return res.status(500).json({ message: 'Erro ao acessar o banco de dados', status: 'Error', log: "Erro no acesso a Database. Tente novamente mais tarde." });
+      }
+
+      const tokenMatch = rows.some(row => {
+        const decodedDatabaseToken = decryptTokenAES(row.token);
+        return decodedDatabaseToken === decodedToken;
+      });
+
+      if (tokenMatch) {
+        return "true";
+      } else {
+        return "false";
+      }
+    });
+  } catch (err) {
+    return "false"
+  }
+};
+
+// Middleware para proteger rotas
+app.use((req, res, next) => {
+  // Verifica se a requisição é para a pasta protegida
+  if (req.path.includes('/html/')) {
+    // Verifica o cookie
+    const resultado = verificarCookie(req.cookies.tokenAES);
+    if (resultado === "false") {
+      return res.redirect('/logout.html');
+    }
+  }
+  next();
 });
 
 app.use(express.static('www'));
