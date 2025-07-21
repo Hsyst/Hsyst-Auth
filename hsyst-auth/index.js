@@ -46,7 +46,7 @@ function generateTokenJWT(email, senha) {
 }
 
 db.serialize(() => {
-//  db.run("CREATE TABLE tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT)");
+  db.run("CREATE TABLE tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT)");
 });
 
 app.use(cookieParser());
